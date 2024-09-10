@@ -43,3 +43,25 @@ router.delete("/:id", (req: Request, res: Response) => {
 });
 
 //TODO: PUT endpoint
+router.put("/:id", (req: Request, res: Response) => {
+  const movieId = parseInt(req.params.id, 10);
+  const movieIndex = movies.findIndex((movie) => movie.id === movieId);
+
+  if (movieIndex === -1) {
+    return res.status(404).send({ error: "Movie Not Found" });
+  }
+
+  const updatedMovie: MovieNoId = req.body;
+
+  //Validation
+  const validationResult = isMovieNoId(updatedMovie);
+  if (!validationResult.valid) {
+    return res.status(400).send({ error: validationResult.error });
+  }
+
+  const movieWithId: Movie = { id: movieId, ...updatedMovie };
+
+  movies[movieIndex] = movieWithId;
+
+  res.status(200).send(movieWithId);
+});
